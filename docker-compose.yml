@@ -1,0 +1,48 @@
+services:
+  db:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: taskdb
+      POSTGRES_USER: taskapp
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-admin}
+    volumes:
+      - taskflow_pgdata:/var/lib/postgresql/data
+      - ./database/init:/docker-entrypoint-initdb.d:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U taskapp -d taskdb"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+    ports:
+      - "5432:5432"
+  api:
+    build: ./api
+    restart: unless-stopped
+    environment:
+      PORT: 3000
+      DATABASE_URL: postgresql://taskapp:${POSTGRES_PASSWORD:-admin}@db:5432/taskdb
+      CORS_ORIGIN: http://localhost:3001
+    depends_on:
+      db:
+        condition: service_healthy
+    ports:
+      - "127.0.0.1:3000:3000"
+    healthcheck:
+      test: ["CMD", "node", "-e", "fetch('http://localhost:3000/ready').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))"]
+      interval: 10s
+      timeout: 4s
+      retries: 10
+  web:
+    build: ./web
+    restart: unless-stopped
+    environment:
+      NODE_ENV: production
+      API_BACKEND_URL: http://api:3000
+    depends_on:
+      api:
+        condition: service_healthy
+    ports:
+      - "3001:3001"
+volumes:
+  taskflow_pgdata:

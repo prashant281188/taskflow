@@ -13,6 +13,9 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v4
+      
       - name: Set up Node.js
         uses: actions/setup-node@v7
         with:
@@ -50,6 +53,7 @@ jobs:
         with:
           context: api/.
           push: true
+          platforms : linux/amd64, linux/arm64
           tags: |
             ${{ secrets.DOCKERHUB_USERNAME }}/taskflow-api:latest
             ${{ secrets.DOCKERHUB_USERNAME }}/taskflow-api:${{ github.sha }}
@@ -63,6 +67,7 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
+
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v4
 
@@ -80,7 +85,7 @@ jobs:
         with:
           context: web/.
           push: true
-          platforms: linux/arm64
+          platforms: linux/arm64, linux/amd64
           tags: |
             ${{ secrets.DOCKERHUB_USERNAME }}/taskflow-web:latest
             ${{ secrets.DOCKERHUB_USERNAME }}/taskflow-web:${{ github.sha }}

@@ -25,7 +25,7 @@ jobs:
 
       - name: Test API & Web
         run: |
-          cd taskflow/api && npm ci 
+          cd api && npm ci 
           cd ../web && npm ci 
 
   build-api:

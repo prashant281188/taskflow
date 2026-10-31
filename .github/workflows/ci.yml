@@ -18,6 +18,10 @@ jobs:
         with:
           node-version: '20'
           cache: 'npm'
+          # Point the cache manager to the actual locations of your lock files
+          cache-dependency-path: |
+            taskflow/api/package-lock.json
+            taskflow/web/package-lock.json
 
       - name: Test API & Web
         run: |

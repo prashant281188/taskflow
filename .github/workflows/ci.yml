@@ -58,6 +58,7 @@ jobs:
   build-web:
     needs: test-applications
     runs-on: ubuntu-latest
+    environment: test
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4

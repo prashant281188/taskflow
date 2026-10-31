@@ -48,7 +48,7 @@ jobs:
       - name: Build and Push API Image
         uses: docker/build-push-action@v6
         with:
-          context: ./taskflow/api
+          context: api/.
           push: true
           tags: |
             ${{ secrets.DOCKERHUB_USERNAME }}/taskflow-api:latest
@@ -76,7 +76,7 @@ jobs:
       - name: Build and Push Web Image
         uses: docker/build-push-action@v7
         with:
-          context: ./taskflow/web
+          context: web/.
           push: true
           tags: |
             ${{ secrets.DOCKERHUB_USERNAME }}/taskflow-web:latest

@@ -1,0 +1,33 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: postgres
+  namespace: taskflow-app
+spec:
+  selector:
+    matchLabels:
+      app: postgres
+  template:
+    metadata:
+      labels:
+        app: postgres 
+    spec:
+      containers:
+        - name: postgres
+          image: postgres:16-alpine
+          env:
+          - name: POSTGRES_USER
+            value: "postgres"
+          - name: POSTGRES_PASSWORD
+            value: "admin"
+          - name: DATABASE_URL
+            value : postgresql://taskapp:admin@localhost:5432/taskdb
+          resources:
+            limits:
+              memory: "128Mi"
+              cpu: "500m"
+            requests:
+              memory: "128Mi"
+              cpu: "500m"
+          ports:
+            - containerPort: 5432

@@ -80,18 +80,44 @@ The web app runs on port 3001 and proxies `/api/backend/*` to the API at port 30
 
 ## API
 
-| Method | Endpoint | Purpose |
-|---|---|---|
-| GET | `/health` | Process health |
-| GET | `/ready` | API and database readiness |
-| GET | `/api/tasks` | List tasks |
-| GET | `/api/tasks/:id` | Get one task |
-| POST | `/api/tasks` | Create task |
-| PATCH | `/api/tasks/:id` | Update title, description, or completion |
-| DELETE | `/api/tasks/:id` | Delete task |
+| Method | Endpoint         | Purpose                                  |
+| ------ | ---------------- | ---------------------------------------- |
+| GET    | `/health`        | Process health                           |
+| GET    | `/ready`         | API and database readiness               |
+| GET    | `/api/tasks`     | List tasks                               |
+| GET    | `/api/tasks/:id` | Get one task                             |
+| POST   | `/api/tasks`     | Create task                              |
+| PATCH  | `/api/tasks/:id` | Update title, description, or completion |
+| DELETE | `/api/tasks/:id` | Delete task                              |
 
 Successful collection/item responses use `{ "data": ... }`; errors use `{ "error": "..." }`. Task IDs are serialized as strings to avoid JavaScript integer precision issues.
 
 ## Production notes
 
 This is a complete runnable starter application, not a fully hardened multi-user SaaS. Before public production deployment, add authentication and per-user authorization, secret management, HTTPS, database backups/migrations, rate limiting, structured logging, and a production-specific CORS policy. Do not expose PostgreSQL publicly in production. Change the default local database password.
+
+
+
+# STANDALONE RUNNING FROM PREBUILD DOCKER IMAGE
+
+## PREREQUISITE
+
+Postgres database should be installed and running on the machine
+
+### Create Network
+
+```bash
+docker network create -d bridge taskflow-network
+```
+
+### Run API
+
+```bash
+docker run -d --name api --network taskflow-network -e DATABASE_URL="postgresql://taskapp:admin@host.docker.internal:5432/taskdb" -p 3000:3000 prashant281188/taskflow-api:latest
+```
+
+### Run WEB
+
+```bash
+docker run --network taskflow-network --name taskflow-web -p 3001:3001 prashant281188/taskflow-web:latest
+```

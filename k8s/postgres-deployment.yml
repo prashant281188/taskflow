@@ -1,33 +1,53 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: postgres
+  name: db
   namespace: taskflow-app
 spec:
   selector:
     matchLabels:
-      app: postgres
+      app: db
   template:
     metadata:
       labels:
-        app: postgres 
+        app: db
     spec:
       containers:
         - name: postgres
           image: postgres:16-alpine
-          env:
-          - name: POSTGRES_USER
-            value: "postgres"
-          - name: POSTGRES_PASSWORD
-            value: "admin"
-          - name: DATABASE_URL
-            value : postgresql://taskapp:admin@localhost:5432/taskdb
-          resources:
-            limits:
-              memory: "128Mi"
-              cpu: "500m"
-            requests:
-              memory: "128Mi"
-              cpu: "500m"
           ports:
             - containerPort: 5432
+          resources:
+            requests:
+              cpu: 100m
+              memory: 256Mi
+            limits:
+              cpu: 500m
+              memory: 512Mi
+          env:
+            - name: POSTGRES_DB
+              value: "taskdb"
+            - name: POSTGRES_USER
+              value: "taskapp"
+            - name: POSTGRES_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: taskapp-secrets
+                  key: postgres-password
+          volumeMounts:
+            - name: pgdata
+              mountPath: /var/lib/postgresql/data
+            - name: init-scripts
+              mountPath: /docker-entrypoint-initdb.d
+          readinessProbe:
+            exec:
+              command: ["pg_isready", "-U", "taskapp", "-d", "taskdb"]
+            initialDelaySeconds: 5
+            periodSeconds: 5
+      volumes:
+        - name: pgdata
+          persistentVolumeClaim:
+            claimName: taskflow-pgdata
+        - name: init-scripts
+          configMap:
+            name: db-init-scripts

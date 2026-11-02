@@ -44,6 +44,10 @@ spec:
               command: ["pg_isready", "-U", "taskapp", "-d", "taskdb"]
             initialDelaySeconds: 5
             periodSeconds: 5
+          livenessProbe:
+            
+          startupProbe:
+            
       volumes:
         - name: pgdata
           persistentVolumeClaim:
@@ -51,3 +55,19 @@ spec:
         - name: init-scripts
           configMap:
             name: db-init-scripts
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: db
+  namespace: taskflow-app
+spec:
+  selector:
+    app: db
+  ports:
+    - name: postgres
+      port: 5432
+      targetPort: 5432
+      nodePort: 30433
+  type: NodePort
+---

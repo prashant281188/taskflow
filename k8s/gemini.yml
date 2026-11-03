@@ -37,8 +37,17 @@ spec:
   accessModes:
     - ReadWriteOnce
   persistentVolumeReclaimPolicy: Retain
+  storageClassName: ""
   hostPath:
     path: "/mnt/taskflow/postgres-data"
+    type: DirectoryOrCreate
+  nodeAffinity:              # hostPath data lives on one node, so pin it
+    required:
+      nodeSelectorTerms:
+        - matchExpressions:
+            - key: kubernetes.io/hostname
+              operator: In
+              values: ["tws-cluster-worker"]
 ---
 apiVersion: v1
 kind: PersistentVolumeClaim

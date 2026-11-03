@@ -97,10 +97,6 @@ spec:
               command: ["pg_isready", "-U", "taskapp", "-d", "taskdb"]
             initialDelaySeconds: 5
             periodSeconds: 5
-          livenessProbe:
-            
-          startupProbe:
-            
       volumes:
         - name: pgdata
           persistentVolumeClaim:

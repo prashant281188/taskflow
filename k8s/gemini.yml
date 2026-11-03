@@ -26,29 +26,7 @@ data:
     CREATE INDEX IF NOT EXISTS idx_tasks_completed ON tasks (completed);
 ---
 # 2. Database Persistent Volume & Persistent Volume Claim
-apiVersion: v1
-kind: PersistentVolume
-metadata:
-  name: taskflow-pgdata-pv
-spec:
-  capacity:
-    storage: 5Gi
-  volumeMode: Filesystem
-  accessModes:
-    - ReadWriteOnce
-  persistentVolumeReclaimPolicy: Retain
-  storageClassName: ""
-  hostPath:
-    path: "/mnt/taskflow/postgres-data"
-    type: DirectoryOrCreate
-  nodeAffinity:              # hostPath data lives on one node, so pin it
-    required:
-      nodeSelectorTerms:
-        - matchExpressions:
-            - key: kubernetes.io/hostname
-              operator: In
-              values: ["tws-cluster-worker"]
----
+
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
